@@ -8,7 +8,7 @@ class UpdateProdutoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+         return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';
     }
 
     public function rules(): array

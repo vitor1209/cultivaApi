@@ -51,3 +51,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/enderecos/{enderecoId}/desvincular', [EnderecoController::class, 'detach']);
     Route::delete('/enderecos/{enderecoId}', [EnderecoController::class, 'destroy']);
 });  
+
+
+use App\Http\Controllers\ImagensController;
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('imagens', ImagensController::class);
+});

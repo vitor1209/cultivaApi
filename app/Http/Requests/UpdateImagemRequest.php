@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreHortaRequest extends FormRequest
+class UpdateImagemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-         return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';
+        return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';;
     }
 
     /**
@@ -22,7 +22,7 @@ class StoreHortaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nome_horta' => 'sometimes|required|string|max:255',
+            'caminho' => 'sometimes|required|string',
             'fk_usuario_id' => 'nullable|integer',
         ];
     }

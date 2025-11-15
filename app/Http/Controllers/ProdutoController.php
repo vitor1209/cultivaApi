@@ -42,7 +42,7 @@ class ProdutoController extends Controller
     public function update(UpdateProdutoRequest $request, Produto $produto)
     {
         // Só permite alterar se for dono
-        if ($produto->fk_horta_id !== auth()->user()->horta->id) {
+        if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
         }
 
@@ -54,7 +54,7 @@ class ProdutoController extends Controller
     public function destroy(Produto $produto)
     {
         // Só permite deletar se for dono
-        if ($produto->fk_horta_id !== auth()->user()->horta->id) {
+        if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
         }
 
