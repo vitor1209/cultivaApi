@@ -63,7 +63,7 @@ class Pedido extends Model
 		return $this->belongsTo(User::class, 'fk_usuario_id');
 	}
 
-	public function itens_selecionados()
+	public function itens()
 	{
 		return $this->hasMany(ItensSelecionado::class, 'fk_pedido_id');
 	}

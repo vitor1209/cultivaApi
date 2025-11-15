@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Imagens;
-use App\Http\Requests\StoreImagensRequest;
-use App\Http\Requests\UpdateImagensRequest;
-use App\Http\Resources\ImagensResource;
+use App\Http\Requests\StoreImagemRequest;
+use App\Http\Requests\UpdateImagemRequest;
+use App\Http\Resources\ImagemResource;
+
 
 class ImagensController extends Controller
 {
@@ -16,48 +17,48 @@ class ImagensController extends Controller
 
     public function index()
     {
-        return ImagensResource::collection(Imagens::all());
+        return ImagemResource::collection(Imagens::all());
     }
 
     public function show(Imagens $imagens)
     {
-        return new ImagensResource($imagens);
+        return new ImagemResource($imagens);
     }
 
-    public function store(StoreImagensRequest $request)
+    public function store(StoreImagemRequest $request)
     {
         $produto = Imagens::create($request->validated());
 
-        return (new ImagensResource($produto));
+        return (new ImagemResource($produto));
          
     }
 
 
-    public function update(UpdateImagensRequest $request, Imagens $imagens)
+    public function update(UpdateImagemRequest $request, Imagens $imagem)
     {
         // Só permite alterar se for dono
 
         $userHortaId = auth()->user()->horta->id;
-        $imagemHortaId = $imagens->produto->horta->id;
+        $imagemHortaId = $imagem->produto->horta->id;
 
         if ($imagemHortaId !== $userHortaId) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
         }
 
-        $imagens->update($request->validated());
-        return new ImagensResource($imagens);
+        $imagem->update($request->validated());
+        return new ImagemResource($imagem);
     }
 
-    public function destroy(Imagens $imagens)
+    public function destroy(Imagem $imagem)
     {
          $userHortaId = auth()->user()->horta->id;
-        $imagemHortaId = $imagens->produto->horta->id;
+        $imagemHortaId = $imagem->produto->horta->id;
 
         if ($imagemHortaId !== $userHortaId) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
         }
 
-        $imagens->delete();
+        $imagem->delete();
         return response()->json(['message' => 'Imagem deletado com sucesso']);
     }
 }
