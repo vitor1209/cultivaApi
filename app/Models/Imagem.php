@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Imagens extends Model
+class Imagem extends Model
 {
 	protected $table = 'imagens';
 	public $timestamps = false;

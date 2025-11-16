@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Imagens;
+use App\Models\Imagem;
 use App\Http\Requests\StoreImagemRequest;
 use App\Http\Requests\UpdateImagemRequest;
 use App\Http\Resources\ImagemResource;
@@ -17,24 +17,24 @@ class ImagensController extends Controller
 
     public function index()
     {
-        return ImagemResource::collection(Imagens::all());
+        return ImagemResource::collection(Imagem::all());
     }
 
-    public function show(Imagens $imagens)
+    public function show(Imagem $imagens)
     {
         return new ImagemResource($imagens);
     }
 
     public function store(StoreImagemRequest $request)
     {
-        $produto = Imagens::create($request->validated());
+        $produto = Imagem::create($request->validated());
 
         return (new ImagemResource($produto));
          
     }
 
 
-    public function update(UpdateImagemRequest $request, Imagens $imagem)
+    public function update(UpdateImagemRequest $request, Imagem $imagem)
     {
         // Só permite alterar se for dono
 
