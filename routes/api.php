@@ -76,3 +76,5 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('/me', function () {
     return auth()->user();
 })->middleware('auth:sanctum');
+
+
