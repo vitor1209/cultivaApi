@@ -59,3 +59,20 @@ use App\Http\Controllers\ImagensController;
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('imagens', ImagensController::class);
 });
+
+
+
+// Route::middleware('consumer')->group(function () {
+//     // rotas que só consumidores acessam
+// });
+
+use App\Http\Controllers\PedidoController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+   
+}); 
+
+Route::get('/me', function () {
+    return auth()->user();
+})->middleware('auth:sanctum');

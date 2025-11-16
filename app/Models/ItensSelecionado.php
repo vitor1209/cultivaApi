@@ -41,7 +41,7 @@ class ItensSelecionado extends Model
 		'preco_item_total'
 	];
 
-	public function produtos()
+	public function produto()
 	{
 		return $this->belongsTo(Produto::class, 'fk_produto_id');
 	}
