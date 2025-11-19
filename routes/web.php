@@ -16,17 +16,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-
-
-use App\Http\Controllers\CarrinhoController;
-use App\Http\Controllers\PedidoController;
-
-Route::middleware(['web', 'auth:sanctum'])->group(function () {
-
-    Route::post('/carrinho', [CarrinhoController::class, 'addToCart']);
-    Route::get('/carrinho', [CarrinhoController::class, 'showCart']);
-    Route::put('/carrinho/{index}', [CarrinhoController::class, 'updateCart']);
-    Route::delete('/carrinho/{index}', [CarrinhoController::class, 'removeFromCart']);
-
-    Route::post('/finalizar_pedido', [PedidoController::class, 'finalizarPedido']);
-});
