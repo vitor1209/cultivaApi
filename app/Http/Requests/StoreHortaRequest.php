@@ -27,3 +27,6 @@ class StoreHortaRequest extends FormRequest
         ];
     }
 }
+
+
+#possui uma autorização de que somente usuarios produtor possam enviar requests, tem as regras do que precisa ser enviado

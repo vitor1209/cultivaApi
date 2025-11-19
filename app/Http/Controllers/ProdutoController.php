@@ -12,7 +12,7 @@ class ProdutoController extends Controller
     public function __construct()
     {
         // Aplica middleware apenas em rotas que alteram o produto
-        $this->middleware('produtor')->only(['store', 'update', 'destroy']);
+        $this->middleware('produtor')->only(['store', 'update', 'destroy']); #usa o middleware do checkprodutor nao tem middleware nas rotas de visualizacao pois todos podem ver estando logados
     }
 
     // Listar todos os produtos
@@ -31,9 +31,9 @@ class ProdutoController extends Controller
     // Criar produto
     public function store(StoreProdutoRequest $request)
     {
-        $produto = Produto::create($request->validated());
+        $produto = Produto::create($request->validated()); #usa os requests do storeproduto
 
-        return (new ProdutoResource($produto));
+        return (new ProdutoResource($produto)); #instancia
          
     }
 
@@ -41,7 +41,7 @@ class ProdutoController extends Controller
     // Atualizar produto
     public function update(UpdateProdutoRequest $request, Produto $produto)
     {
-        // Só permite alterar se for dono
+        // Só permite alterar se for dono daquele produto
         if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
         }

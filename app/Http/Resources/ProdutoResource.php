@@ -22,3 +22,5 @@ class ProdutoResource extends JsonResource
         ];
     }
 }
+
+#o que vai ser retornado

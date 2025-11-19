@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class EnderecoController extends Controller
 {
-    // Listar endereços do usuário autenticado
+    #Listar endereços do usuário autenticado
     public function index()
     {
         $usuario = Auth::user();
         return response()->json($usuario->enderecos);
     }
 
-    // Criar e vincular um novo endereço ao usuário autenticado
+    #criar e vincular um novo endereço ao usuário autenticado
     public function store(Request $request)
     {
         $usuario = Auth::user();
@@ -67,17 +67,17 @@ class EnderecoController extends Controller
     }
 
     // Remover vínculo com o endereço (sem excluir)
-    public function detach($enderecoId)
-    {
-        $usuario = Auth::user();
+    // public function detach($enderecoId)
+    // {
+    //     $usuario = Auth::user();
 
-        if (!$usuario->enderecos->contains($enderecoId)) {
-            return response()->json(['error' => 'Você não pode remover este endereço.'], 403);
-        }
+    //     if (!$usuario->enderecos->contains($enderecoId)) {
+    //         return response()->json(['error' => 'Você não pode remover este endereço.'], 403);
+    //     }
 
-        $usuario->enderecos()->detach($enderecoId);
-        return response()->json(['message' => 'Endereço desvinculado com sucesso!']);
-    }
+    //     $usuario->enderecos()->detach($enderecoId);
+    //     return response()->json(['message' => 'Endereço desvinculado com sucesso!']);
+    // }
 
     // Deletar o endereço completamente (só se for do usuário)
     public function destroy($enderecoId)

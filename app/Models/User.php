@@ -70,3 +70,7 @@ class User extends Authenticatable
         $this->notify(new \App\Notifications\ResetPasswordNotification($token));
     }
 }
+
+
+
+#funciona como uma 'tabela' no banco de dados, com os dados que são preenchiveis e os que precisam estar escondidos, as funções representam as relações entre as tabelas

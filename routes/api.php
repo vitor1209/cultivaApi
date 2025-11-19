@@ -21,6 +21,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('produtos', ProdutoController::class);
 });
 
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('hortas', HortaController::class);
 });
@@ -37,15 +38,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
 use App\Http\Controllers\Auth\PasswordResetController;
 
+
 Route::post('/forgot_password', [PasswordResetController::class, 'sendResetLink']);
 Route::post('/reset_password', [PasswordResetController::class, 'resetPassword']);
 
 
 use App\Http\Controllers\UnidadeMedidaController;
 // Rota só de leitura
-Route::get('/unidade_medida', [UnidadeMedidaController::class, 'index']);
-Route::get('/unidade_medida/{id}', [UnidadeMedidaController::class, 'show']);
 
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/unidade_medida', [UnidadeMedidaController::class, 'index']);
+    Route::get('/unidade_medida/{id}', [UnidadeMedidaController::class, 'show']);
+});
 
 
 use App\Http\Controllers\EnderecoController;
@@ -79,8 +84,6 @@ Route::middleware('auth:sanctum')->group(function () {
    
 }); 
 
-Route::get('/me', function () {
-    return auth()->user();
-})->middleware('auth:sanctum');
 
 
+#o middleware esta sendo usado para que somemete usuarios logados possam acessar as rotas especificas, os de recuperar senha não possuem pois os usuarios não lembram o login
