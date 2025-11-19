@@ -35,6 +35,12 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+use App\Http\Controllers\Auth\PasswordResetController;
+
+Route::post('/forgot_password', [PasswordResetController::class, 'sendResetLink']);
+Route::post('/reset_password', [PasswordResetController::class, 'resetPassword']);
+
+
 use App\Http\Controllers\UnidadeMedidaController;
 // Rota só de leitura
 Route::get('/unidade_medida', [UnidadeMedidaController::class, 'index']);

@@ -67,7 +67,7 @@ class Produto extends Model
 
 	public function imagens()
 	{
-		return $this->hasMany(Imagens::class, 'fk_produto_id');
+		return $this->hasMany(Imagem::class, 'fk_produto_id');
 	}
 
 	public function itens_selecionados()
