@@ -48,11 +48,16 @@ class ProdutoController extends Controller
             $query->with('unidadeMedida')->get()
         );
     }
+
+
+
     public function show(Produto $produto)
     {
         return new ProdutoResource($produto);
     }
 
+
+    
     public function store(StoreProdutoRequest $request)
     {
         $result = DB::transaction(function () use ($request) {

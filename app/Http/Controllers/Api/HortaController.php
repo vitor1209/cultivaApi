@@ -11,16 +11,15 @@ class HortaController extends Controller
 {
 
 
-       public function __construct()
+    public function __construct()
     {
-        
+
         $this->middleware('produtor')->only(['update', 'destroy']);
     }
 
     public function index()
     {
         return HortaResource::collection(Horta::all());
-
     }
 
 
@@ -31,22 +30,22 @@ class HortaController extends Controller
     }
 
 
-  public function update(UpdateHortaRequest $request, Horta $horta)
+    public function update(UpdateHortaRequest $request, Horta $horta)
     {
 
         // Só permite alterar se for dono
-        
-    // $horta = Horta::findOrFail($id);
 
-    if ((int)$horta->fk_usuario_id !== auth()->id()) {
-        return response()->json(['message' => 'Acesso negado. Você não é o dono desta horta.'], 403);
+        // $horta = Horta::findOrFail($id);
+
+        if ((int)$horta->fk_usuario_id !== auth()->id()) {
+            return response()->json(['message' => 'Acesso negado. Você não é o dono desta horta.'], 403);
+        }
+
+        $horta->update($request->validated());
+        return new HortaResource($horta);
     }
 
-    $horta->update($request->validated());
-    return new HortaResource($horta);
-    }
-
-       public function destroy(Horta $horta)
+    public function destroy(Horta $horta)
     {
 
         if ($horta->fk_usuario_id !== auth()->id()) {
