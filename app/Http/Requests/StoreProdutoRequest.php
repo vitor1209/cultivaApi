@@ -31,6 +31,10 @@ class StoreProdutoRequest extends FormRequest
             'quant_unit_medida' => 'sometimes|required|integer|min:0',
             'fk_horta_id' => 'nullable|integer',
             'fk_unidade_medida_id' => 'nullable|integer',
+
+
+            #imagens
+            'caminho' => 'sometimes|nullabe|string',
     ];
 }
 

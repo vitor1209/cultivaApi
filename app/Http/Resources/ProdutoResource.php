@@ -19,6 +19,8 @@ class ProdutoResource extends JsonResource
             'quant_unit_medida' => $this->quant_unit_medida,
             'fk_horta_id' => $this->fk_horta_id,
             'fk_unidade_medida_id' => $this->fk_unidade_medida_id,
+            'imagem' => $this->imagem ? $this->imagem->caminho : null,
+
         ];
     }
 }

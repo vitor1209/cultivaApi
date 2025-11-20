@@ -7,12 +7,19 @@ use App\Http\Requests\StoreProdutoRequest;
 use App\Http\Requests\UpdateProdutoRequest;
 use App\Http\Resources\ProdutoResource;
 use App\Http\Controllers\Controller;
+use App\Models\Imagem;
+
+use Illuminate\Support\Facades\DB;
+
+use Illuminate\Http\Request;
+
+
 
 class ProdutoController extends Controller
 {
     public function __construct()
     {
-        
+
         $this->middleware('produtor')->only(['store', 'update', 'destroy']); #usa o middleware do checkprodutor nao tem middleware nas rotas de visualizacao pois todos podem ver estando logados
     }
 
@@ -30,10 +37,25 @@ class ProdutoController extends Controller
 
     public function store(StoreProdutoRequest $request)
     {
-        $produto = Produto::create($request->validated()); #usa os requests do storeproduto
+        $result = DB::transaction(function () use ($request) {
+            $produto = Produto::create($request->validated()); #usa os requests do storeproduto
 
-        return (new ProdutoResource($produto)); #instancia
-         
+            $imagem =   Imagem::create([
+                'caminho' => $request['caminho'],
+                'fk_usuario_id' => auth()->user->id,
+                'fk_produto_id' => $produto->id,
+            ]);
+
+            return [
+                'produto' => $produto,
+                'imagem'  => $imagem,
+            ];
+        });
+
+        $result['produto']->load('imagem');
+
+        return (new ProdutoResource($result['produto'])); #instancia
+
     }
 
 
