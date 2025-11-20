@@ -11,7 +11,7 @@ class StoreProdutoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-         return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';
+        return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';
     }
 
     /**
@@ -34,10 +34,7 @@ class StoreProdutoRequest extends FormRequest
 
 
             #imagens
-            'caminho' => 'sometimes|nullabe|blob',
-    ];
+            'caminho' => 'required|image|mimes:jpg,png,jpeg|max:2048'
+        ];
+    }
 }
-
-
-}
-

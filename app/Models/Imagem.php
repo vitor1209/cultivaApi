@@ -26,7 +26,6 @@ class Imagem extends Model
 
 	protected $casts = [
 		'fk_produto_id' => 'int',
-		'caminho' => 'blob'
 	];
 
 	protected $fillable = [

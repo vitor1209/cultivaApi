@@ -24,12 +24,30 @@ class ProdutoController extends Controller
     }
 
 
-    public function index()
+    public function index(Request $request)
     {
-        return ProdutoResource::collection(Produto::all());
-        return Produto::with('unidadeMedida')->get();
-    }
+        $min  = $request->input('min');
+        $max  = $request->input('max');
+        $nome = $request->input('nome');
 
+        $query = Produto::query();
+
+        if (!is_null($min)) {
+            $query->where('preco', '>=', $min);
+        }
+
+        if (!is_null($max)) {
+            $query->where('preco', '<=', $max);
+        }
+
+        if (!is_null($nome)) {
+            $query->where('nome', 'like', "%{$nome}%");
+        }
+
+        return ProdutoResource::collection(
+            $query->with('unidadeMedida')->get()
+        );
+    }
     public function show(Produto $produto)
     {
         return new ProdutoResource($produto);
@@ -41,7 +59,7 @@ class ProdutoController extends Controller
             $produto = Produto::create($request->validated()); #usa os requests do storeproduto
 
             $imagem = Imagem::create([
-                'caminho' => $request['caminho'],
+                'caminho' => $request->file('imagem')->store(),
                 'fk_usuario_id' => auth()->user->id,
                 'fk_produto_id' => $produto->id,
             ]);
@@ -74,11 +92,11 @@ class ProdutoController extends Controller
 
                 if ($produto->imagem) {
                     $produto->imagem->update([
-                        'caminho' => $request->caminho,
+                        'caminho' => $request->file('imagem')->store(),
                     ]);
                 } else {
                     Imagem::create([
-                        'caminho' => $request->caminho,
+                        'caminho' => $request->file('imagem')->store(),
                         'fk_usuario_id' => auth()->user()->id,
                         'fk_produto_id' => $produto->id,
                     ]);
@@ -106,27 +124,27 @@ class ProdutoController extends Controller
 
 
 
-    public function filtrarProdutos(Request $request)
-    {
+    // public function filtrarProdutos(Request $request)
+    // {
 
-        $query = Produto::query();
+    //     $query = Produto::query();
 
-        #preco minimo
-        if ($request->has('preco_min') && !empty($resquest->preco_min)) {
-            $query->where('preco', '>=', $request->preco_min);
-        };
+    //     #preco minimo
+    //     if ($request->has('preco_min') && !empty($resquest->preco_min)) {
+    //         $query->where('preco', '>=', $request->preco_min);
+    //     };
 
-        #preco max
-        if ($request->has('preco_max') && !empty($resquest->preco_max)) {
-            $query->where('preco', '<=', $request->preco_max);
-        };
+    //     #preco max
+    //     if ($request->has('preco_max') && !empty($resquest->preco_max)) {
+    //         $query->where('preco', '<=', $request->preco_max);
+    //     };
 
-        if ($request->has('nome') && !empty($resquest->nome)) {
-            $query->where('nome', 'like', '%,' . $request->nome . '%');
-        };
+    //     if ($request->has('nome') && !empty($resquest->nome)) {
+    //         $query->where('nome', 'like', '%,' . $request->nome . '%');
+    //     };
 
-        $produtos = $query->get();
+    //     $produtos = $query->get();
 
-        return response()->json($produtos);
-    }
+    //     return response()->json($produtos);
+    // }
 }
