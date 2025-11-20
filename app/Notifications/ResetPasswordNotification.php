@@ -30,7 +30,9 @@ class ResetPasswordNotification extends Notification
             ->subject('Recuperação de Senha')
             ->line('Aqui está o seu token de recuperação de senha:')
             ->line($this->token)
-            ->line('Use este token no endpoint /reset-password para criar uma nova senha.')
-            ->line('Se você não solicitou a recuperação, ignore este email.');
+            ->line('Use este token no site para criar uma nova senha.')
+            ->line('Se você não solicitou a recuperação, ignore este email.')
+            ->line('Abraços, Cultiva+.');
+
     }
 }
