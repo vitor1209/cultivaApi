@@ -48,7 +48,7 @@ class AuthController extends Controller
 
             if ($data['Tipo_usuario'] === 'produtor') {
                 Horta::create([
-                    'nome_horta' => $data['NomeHorta'],
+                    'nome_horta' => $data['nome_horta'],
                     'frete' => $data['frete'],
                     'fk_usuario_id' => $user->id,
                 ]);
