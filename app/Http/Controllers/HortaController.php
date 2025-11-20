@@ -14,7 +14,7 @@ class HortaController extends Controller
        public function __construct()
     {
         
-        $this->middleware('produtor')->only(['store', 'update', 'destroy']);
+        $this->middleware('produtor')->only(['update', 'destroy']);
     }
 
     public function index()
@@ -24,14 +24,6 @@ class HortaController extends Controller
     }
 
 
-
-    public function store(StoreHortaRequest $request)
-    {
-        $horta = Horta::create($request->validated());
-
-        return (new HortaResource($horta));
-         
-    }
 
     public function show(Horta $horta)
     {

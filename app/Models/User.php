@@ -28,7 +28,10 @@ class User extends Authenticatable
         'datanasc',
         'foto',
         'banner',
-        'Tipo_usuario'
+        'Tipo_usuario',
+        'frete',
+        'nome_horta'
+        
     ];
 
     /**

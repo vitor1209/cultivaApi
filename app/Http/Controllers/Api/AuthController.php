@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Horta;
+use App\Models\Pedido;
 
 use Illuminate\Support\Facades\DB;
 
@@ -26,36 +27,35 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'Tipo_usuario' => 'required|in:consumidor,produtor', // <- mudou
 
-                    // Campos apenas para produtores
-        'nome_horta' => 'required_if:Tipo_usuario,produtor|string|max:255',
-        'frete' => 'required_if:Tipo_usuario,produtor|numeric|min:0',
-    ]);
-    
-
-        $user = DB::transaction(function() use ($data) { #se alguma parte falhar não salva no banco de dados
-
-        $user = User::create([
-            'nome' => $data['nome'],
-            'email' => $data['email'],
-            'Tipo_usuario' => $data['Tipo_usuario'], // <- mudou
-            'telefone' => $data['telefone'],
-            'datanasc' => $data['datanasc'],
-            'foto' => $data['foto'] ?? null,
-            'banner' => $data['banner'] ?? null,
-            'password' => bcrypt($data['password']),
+            // Campos apenas para produtores
+            'nome_horta' => 'required_if:Tipo_usuario,produtor|string|max:255',
+            'frete' => 'required_if:Tipo_usuario,produtor|numeric|min:0',
         ]);
 
-                if ($data['Tipo_usuario'] === 'produtor') {
-            Horta::create([
-                'nome_horta' => $data['NomeHorta'],
-                'frete' => $data['frete'],
-                'fk_usuario_id' => $user->id,
+
+        $user = DB::transaction(function () use ($data) { #se alguma parte falhar não salva no banco de dados
+
+            $user = User::create([
+                'nome' => $data['nome'],
+                'email' => $data['email'],
+                'Tipo_usuario' => $data['Tipo_usuario'], // <- mudou
+                'telefone' => $data['telefone'],
+                'datanasc' => $data['datanasc'],
+                'foto' => $data['foto'] ?? null,
+                'banner' => $data['banner'] ?? null,
+                'password' => bcrypt($data['password']),
             ]);
-        }
 
-                return $user;
+            if ($data['Tipo_usuario'] === 'produtor') {
+                Horta::create([
+                    'nome_horta' => $data['NomeHorta'],
+                    'frete' => $data['frete'],
+                    'fk_usuario_id' => $user->id,
+                ]);
+            }
 
-    });
+            return $user;
+        });
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
@@ -98,4 +98,5 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
         return response()->json(['message' => 'Logout realizado']);
     }
+
 }
