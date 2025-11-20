@@ -77,12 +77,28 @@ Route::middleware('auth:sanctum')->group(function () {
 //     // rotas que só consumidores acessam
 // });
 
+// use App\Http\Controllers\PedidoController;
+
+// Route::middleware('auth:sanctum')->group(function () {
+//     Route::post('/pedidos', [PedidoController::class, 'store']);
+   
+// }); 
+
+
+use App\Http\Controllers\CarrinhoController;
 use App\Http\Controllers\PedidoController;
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/pedidos', [PedidoController::class, 'store']);
-   
-}); 
+    
+    // Carrinho
+    Route::post('/carrinho/adicionar', [CarrinhoController::class, 'adicionar']);
+    Route::get('/carrinho', [CarrinhoController::class, 'listar']);
+    Route::delete('/carrinho/{id}', [CarrinhoController::class, 'remover']);
+
+    // Finalizar pedido
+    Route::post('/pedido/finalizar', [PedidoController::class, 'finalizarPedido']);
+
+});
 
 
 

@@ -35,7 +35,8 @@ class Horta extends Model
 
 	protected $fillable = [
 		'nome_horta',
-		'fk_usuario_id'
+		'fk_usuario_id',
+		'frete'
 	];
 
 	public function usuario()

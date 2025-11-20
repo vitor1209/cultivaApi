@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Pedido;
 use App\Models\ItensSelecionado;
 use App\Models\Produto;
+use App\Models\Entrega;
 
 use App\Http\Requests\StorePedidoRequest;
 

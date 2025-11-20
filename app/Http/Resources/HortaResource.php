@@ -18,6 +18,7 @@ class HortaResource extends JsonResource
             'id' => $this->id,
             'nome_horta' => $this->nome_horta,
             'fk_usuario_id' => $this->fk_usuario_id,
+            'frete' => $this->frete,
         ];
     }
 }

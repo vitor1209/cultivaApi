@@ -24,6 +24,8 @@ class StoreHortaRequest extends FormRequest
         return [
             'nome_horta' => 'sometimes|required|string|max:255',
             'fk_usuario_id' => 'nullable|integer',
+            'frete' => 'nullable|float',
+
         ];
     }
 }

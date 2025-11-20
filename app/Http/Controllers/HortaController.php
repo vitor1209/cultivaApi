@@ -80,6 +80,6 @@ class HortaController extends Controller
         }
 
         $horta->delete();
-        return response()->json(['message' => 'Horta deletado com sucesso']);
+        return response()->json(['message' => 'Horta deletada com sucesso']);
     }
 }
