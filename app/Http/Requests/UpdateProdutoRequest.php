@@ -8,7 +8,7 @@ class UpdateProdutoRequest extends FormRequest
 {
     public function authorize(): bool
     {
-         return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';
+        return auth()->check() && auth()->user()->Tipo_usuario === 'produtor';
     }
 
     public function rules(): array
@@ -22,6 +22,9 @@ class UpdateProdutoRequest extends FormRequest
             'quant_unit_medida' => 'sometimes|required|integer|min:0',
             'fk_horta_id' => 'nullable|integer',
             'fk_unidade_medida_id' => 'nullable|integer',
+
+            #imagens
+            'caminho' => 'sometimes|nullabe|string'
         ];
     }
 }

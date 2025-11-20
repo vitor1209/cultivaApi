@@ -40,7 +40,7 @@ class ProdutoController extends Controller
         $result = DB::transaction(function () use ($request) {
             $produto = Produto::create($request->validated()); #usa os requests do storeproduto
 
-            $imagem =   Imagem::create([
+            $imagem = Imagem::create([
                 'caminho' => $request['caminho'],
                 'fk_usuario_id' => auth()->user->id,
                 'fk_produto_id' => $produto->id,
@@ -57,18 +57,43 @@ class ProdutoController extends Controller
         return (new ProdutoResource($result['produto'])); #instancia
 
     }
+    
 
 
     public function update(UpdateProdutoRequest $request, Produto $produto)
-    {
-        #só permite alterar se o produtor for o dono da horta que tem aquele produto
-        if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
-            return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
-        }
+{
+    if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
+        return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
+    }
+
+    DB::transaction(function () use ($request, $produto) {
 
         $produto->update($request->validated());
-        return new ProdutoResource($produto);
-    }
+
+        if ($request->has('caminho')) {
+
+            if ($produto->imagem) {
+                $produto->imagem->update([
+                    'caminho' => $request->caminho,
+                ]);
+
+            } else {
+                Imagem::create([
+                    'caminho' => $request->caminho,
+                    'fk_usuario_id' => auth()->user()->id,
+                    'fk_produto_id' => $produto->id,
+                ]);
+            }
+        }
+    });
+
+    $produto->load('imagem');
+
+    return new ProdutoResource($produto);
+}
+
+
+
 
     public function destroy(Produto $produto)
     {
@@ -78,5 +103,11 @@ class ProdutoController extends Controller
 
         $produto->delete();
         return response()->json(['message' => 'Produto deletado com sucesso']);
+    }
+
+
+
+    public function filtrarProdutos(Request $request){
+
     }
 }
