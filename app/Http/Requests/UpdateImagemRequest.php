@@ -22,7 +22,7 @@ class UpdateImagemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'caminho' => 'sometimes|required|string',
+            'caminho' => 'sometimes|required|blob',
             'fk_usuario_id' => 'nullable|integer',
         ];
     }

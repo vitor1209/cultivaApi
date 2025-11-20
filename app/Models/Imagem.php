@@ -25,7 +25,8 @@ class Imagem extends Model
 	public $timestamps = false;
 
 	protected $casts = [
-		'fk_produto_id' => 'int'
+		'fk_produto_id' => 'int',
+		'caminho' => 'blob'
 	];
 
 	protected $fillable = [

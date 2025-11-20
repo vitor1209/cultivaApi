@@ -34,7 +34,7 @@ class StoreProdutoRequest extends FormRequest
 
 
             #imagens
-            'caminho' => 'sometimes|nullabe|string',
+            'caminho' => 'sometimes|nullabe|blob',
     ];
 }
 

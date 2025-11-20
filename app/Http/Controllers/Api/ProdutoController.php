@@ -57,40 +57,39 @@ class ProdutoController extends Controller
         return (new ProdutoResource($result['produto'])); #instancia
 
     }
-    
+
 
 
     public function update(UpdateProdutoRequest $request, Produto $produto)
-{
-    if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
-        return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
-    }
-
-    DB::transaction(function () use ($request, $produto) {
-
-        $produto->update($request->validated());
-
-        if ($request->has('caminho')) {
-
-            if ($produto->imagem) {
-                $produto->imagem->update([
-                    'caminho' => $request->caminho,
-                ]);
-
-            } else {
-                Imagem::create([
-                    'caminho' => $request->caminho,
-                    'fk_usuario_id' => auth()->user()->id,
-                    'fk_produto_id' => $produto->id,
-                ]);
-            }
+    {
+        if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
+            return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
         }
-    });
 
-    $produto->load('imagem');
+        DB::transaction(function () use ($request, $produto) {
 
-    return new ProdutoResource($produto);
-}
+            $produto->update($request->validated());
+
+            if ($request->has('caminho')) {
+
+                if ($produto->imagem) {
+                    $produto->imagem->update([
+                        'caminho' => $request->caminho,
+                    ]);
+                } else {
+                    Imagem::create([
+                        'caminho' => $request->caminho,
+                        'fk_usuario_id' => auth()->user()->id,
+                        'fk_produto_id' => $produto->id,
+                    ]);
+                }
+            }
+        });
+
+        $produto->load('imagem');
+
+        return new ProdutoResource($produto);
+    }
 
 
 
@@ -107,7 +106,27 @@ class ProdutoController extends Controller
 
 
 
-    public function filtrarProdutos(Request $request){
+    public function filtrarProdutos(Request $request)
+    {
 
+        $query = Produto::query();
+
+        #preco minimo
+        if ($request->has('preco_min') && !empty($resquest->preco_min)) {
+            $query->where('preco', '>=', $request->preco_min);
+        };
+
+        #preco max
+        if ($request->has('preco_max') && !empty($resquest->preco_max)) {
+            $query->where('preco', '<=', $request->preco_max);
+        };
+
+        if ($request->has('nome') && !empty($resquest->nome)) {
+            $query->where('nome', 'like', '%,' . $request->nome . '%');
+        };
+
+        $produtos = $query->get();
+
+        return response()->json($produtos);
     }
 }
