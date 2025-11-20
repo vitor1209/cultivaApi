@@ -5,6 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Horta;
+
+use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -21,7 +25,14 @@ class AuthController extends Controller
             'banner' => 'nullable|string',
             'password' => ['required', 'confirmed', Password::defaults()],
             'Tipo_usuario' => 'required|in:consumidor,produtor', // <- mudou
-        ]);
+
+                    // Campos apenas para produtores
+        'nome_horta' => 'required_if:Tipo_usuario,produtor|string|max:255',
+        'frete' => 'required_if:Tipo_usuario,produtor|numeric|min:0',
+    ]);
+    
+
+        $user = DB::transaction(function() use ($data) { #se alguma parte falhar não salva no banco de dados
 
         $user = User::create([
             'nome' => $data['nome'],
@@ -33,6 +44,18 @@ class AuthController extends Controller
             'banner' => $data['banner'] ?? null,
             'password' => bcrypt($data['password']),
         ]);
+
+                if ($data['Tipo_usuario'] === 'produtor') {
+            Horta::create([
+                'nome_horta' => $data['NomeHorta'],
+                'frete' => $data['frete'],
+                'fk_usuario_id' => $user->id,
+            ]);
+        }
+
+                return $user;
+
+    });
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([

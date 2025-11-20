@@ -10,7 +10,7 @@ use App\Http\Resources\ImagemResource;
 
 class ImagensController extends Controller
 {
-    public function __construct()
+    public function __construct() #check middleware
     {
         $this->middleware('produtor')->only(['store', 'update', 'destroy']);
     }
@@ -36,13 +36,13 @@ class ImagensController extends Controller
 
     public function update(UpdateImagemRequest $request, Imagem $imagem)
     {
-        // Só permite alterar se for dono
 
+        #só permite alterar se for o dono
         $userHortaId = auth()->user()->horta->id;
         $imagemHortaId = $imagem->produto->horta->id;
 
         if ($imagemHortaId !== $userHortaId) {
-            return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
+            return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $imagem->update($request->validated());
@@ -55,7 +55,7 @@ class ImagensController extends Controller
         $imagemHortaId = $imagem->produto->horta->id;
 
         if ($imagemHortaId !== $userHortaId) {
-            return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
+            return response()->json(['message' => 'Acesso negado.'], 403);
         }
 
         $imagem->delete();

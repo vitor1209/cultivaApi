@@ -8,12 +8,12 @@ use App\Models\UnidadeMedida;
 
 class UnidadeMedidaController extends Controller
 {
-    public function index()
+    public function index() #aqui lista as unidades de medida, elas já são pre definidas e o produtor apenas escolhe qual vai usar
     {
         return response()->json(UnidadeMedida::all());
     }
 
-    public function show($id)
+    public function show($id) #mostra uma especifica pelo id
     {
         $unidade = UnidadeMedida::find($id);
         if (!$unidade) {

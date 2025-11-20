@@ -44,7 +44,6 @@ Route::post('/reset_password', [PasswordResetController::class, 'resetPassword']
 
 
 use App\Http\Controllers\UnidadeMedidaController;
-// Rota só de leitura
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -73,29 +72,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-// Route::middleware('consumer')->group(function () {
-//     // rotas que só consumidores acessam
-// });
-
-// use App\Http\Controllers\PedidoController;
-
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::post('/pedidos', [PedidoController::class, 'store']);
-   
-// }); 
-
 
 use App\Http\Controllers\CarrinhoController;
 use App\Http\Controllers\PedidoController;
 
 Route::middleware('auth:sanctum')->group(function () {
     
-    // Carrinho
-    Route::post('/carrinho/adicionar', [CarrinhoController::class, 'adicionar']);
-    Route::get('/carrinho', [CarrinhoController::class, 'listar']);
-    Route::delete('/carrinho/{id}', [CarrinhoController::class, 'remover']);
+    // 
+    Route::post('/carrinho', [CarrinhoController::class, 'store']);
+    Route::get('/carrinho', [CarrinhoController::class, 'index']);
+    Route::delete('/carrinho/{id}', [CarrinhoController::class, 'destroy']);
 
-    // Finalizar pedido
     Route::post('/pedido/finalizar', [PedidoController::class, 'finalizarPedido']);
 
 });

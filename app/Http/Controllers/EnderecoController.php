@@ -40,13 +40,12 @@ class EnderecoController extends Controller
         ], 201);
     }
 
-    // Atualizar endereço do usuário autenticado
     public function update(Request $request, $enderecoId)
     {
         $usuario = Auth::user();
         $endereco = Endereco::findOrFail($enderecoId);
 
-        //  Verifica se o endereço pertence ao usuário
+        #se o endereco pertence ao usuario
         if (!$usuario->enderecos->contains($enderecoId)) {
             return response()->json(['error' => 'Você não tem permissão para editar este endereço.'], 403);
         }
@@ -66,20 +65,7 @@ class EnderecoController extends Controller
         return response()->json(['message' => 'Endereço atualizado!', 'endereco' => $endereco]);
     }
 
-    // Remover vínculo com o endereço (sem excluir)
-    // public function detach($enderecoId)
-    // {
-    //     $usuario = Auth::user();
 
-    //     if (!$usuario->enderecos->contains($enderecoId)) {
-    //         return response()->json(['error' => 'Você não pode remover este endereço.'], 403);
-    //     }
-
-    //     $usuario->enderecos()->detach($enderecoId);
-    //     return response()->json(['message' => 'Endereço desvinculado com sucesso!']);
-    // }
-
-    // Deletar o endereço completamente (só se for do usuário)
     public function destroy($enderecoId)
     {
         $usuario = Auth::user();
@@ -89,8 +75,7 @@ class EnderecoController extends Controller
             return response()->json(['error' => 'Você não pode excluir este endereço.'], 403);
         }
 
-        // Remove o vínculo e apaga o endereço
-        $usuario->enderecos()->detach($enderecoId);
+        $usuario->enderecos()->detach($enderecoId); #tira o vinculo
         $endereco->delete();
 
         return response()->json(['message' => 'Endereço excluído com sucesso!']);

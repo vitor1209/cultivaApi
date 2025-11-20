@@ -9,13 +9,11 @@ use App\Http\Resources\HortaResource;
 
 class HortaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
 
        public function __construct()
     {
-        // Aplica middleware apenas em rotas que alteram a horta
+        
         $this->middleware('produtor')->only(['store', 'update', 'destroy']);
     }
 
@@ -35,25 +33,12 @@ class HortaController extends Controller
          
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Horta $horta)
     {
         return new HortaResource($horta);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
   public function update(UpdateHortaRequest $request, Horta $horta)
     {
 
@@ -69,12 +54,9 @@ class HortaController extends Controller
     return new HortaResource($horta);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
        public function destroy(Horta $horta)
     {
-        // Só permite deletar se for dono
+
         if ($horta->fk_usuario_id !== auth()->id()) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono desta horta.'], 403);
         }
@@ -83,3 +65,5 @@ class HortaController extends Controller
         return response()->json(['message' => 'Horta deletada com sucesso']);
     }
 }
+
+#funcoes parecidas com o do produto
