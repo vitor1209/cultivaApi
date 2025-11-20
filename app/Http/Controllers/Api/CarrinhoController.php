@@ -9,6 +9,15 @@ use App\Models\Produto;
 
 class CarrinhoController extends Controller
 {
+
+
+    public function __construct()
+    {
+
+        $this->middleware('consumidor')->only(['store', 'update', 'destroy']);
+    }
+
+    
     public function store(Request $request) #cria um 'carrinho'
     {
         $request->validate([

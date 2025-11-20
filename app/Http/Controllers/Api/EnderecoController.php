@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class EnderecoController extends Controller
 {
+
+
     #Listar endereços do usuário autenticado
     public function index()
     {
