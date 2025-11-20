@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Horta;
-use App\Http\Requests\StoreHortaRequest;
 use App\Http\Requests\UpdateHortaRequest;
 use App\Http\Resources\HortaResource;
+use App\Http\Controllers\Controller;
 
 class HortaController extends Controller
 {

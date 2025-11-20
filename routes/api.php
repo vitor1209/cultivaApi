@@ -2,8 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProdutoController;
-use App\Http\Controllers\HortaController;
+use App\Http\Controllers\Api\ProdutoController;
+use App\Http\Controllers\Api\HortaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ Route::post('/forgot_password', [PasswordResetController::class, 'sendResetLink'
 Route::post('/reset_password', [PasswordResetController::class, 'resetPassword']);
 
 
-use App\Http\Controllers\UnidadeMedidaController;
+use App\Http\Controllers\Api\UnidadeMedidaController;
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -52,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-use App\Http\Controllers\EnderecoController;
+use App\Http\Controllers\Api\EnderecoController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/enderecos', [EnderecoController::class, 'index']);
@@ -63,7 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });  
 
 
-use App\Http\Controllers\ImagensController;
+use App\Http\Controllers\Api\ImagensController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -73,12 +73,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-use App\Http\Controllers\CarrinhoController;
-use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\Api\CarrinhoController;
+use App\Http\Controllers\Api\PedidoController;
 
 Route::middleware('auth:sanctum')->group(function () {
-    
-    // 
+
     Route::post('/carrinho', [CarrinhoController::class, 'store']);
     Route::get('/carrinho', [CarrinhoController::class, 'index']);
     Route::delete('/carrinho/{id}', [CarrinhoController::class, 'destroy']);
@@ -86,7 +85,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pedido/finalizar', [PedidoController::class, 'finalizarPedido']);
 
 });
-
-
 
 #o middleware esta sendo usado para que somemete usuarios logados possam acessar as rotas especificas, os de recuperar senha não possuem pois os usuarios não lembram o login

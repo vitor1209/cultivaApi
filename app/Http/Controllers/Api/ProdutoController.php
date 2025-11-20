@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Produto;
 use App\Http\Requests\StoreProdutoRequest;
 use App\Http\Requests\UpdateProdutoRequest;
 use App\Http\Resources\ProdutoResource;
+use App\Http\Controllers\Controller;
 
 class ProdutoController extends Controller
 {

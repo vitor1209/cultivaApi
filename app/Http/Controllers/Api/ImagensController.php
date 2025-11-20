@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use App\Models\Imagem;
 use App\Http\Requests\StoreImagemRequest;
 use App\Http\Requests\UpdateImagemRequest;
 use App\Http\Resources\ImagemResource;
+use App\Http\Controllers\Controller;
 
 
 class ImagensController extends Controller

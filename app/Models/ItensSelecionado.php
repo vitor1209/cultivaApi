@@ -38,7 +38,8 @@ class ItensSelecionado extends Model
 		'fk_produto_id',
 		'fk_pedido_id',
 		'quantidade_item_total',
-		'preco_item_total'
+		'preco_item_total',
+		'fk_usuario_id'
 	];
 
 	public function produto()
