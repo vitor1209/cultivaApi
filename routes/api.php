@@ -67,7 +67,7 @@ use App\Http\Controllers\Api\ImagensController;
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('imagens', ImagensController::class);
+    Route::apiResource('/imagens', ImagensController::class);
 });
 
 
