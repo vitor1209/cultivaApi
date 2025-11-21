@@ -38,7 +38,7 @@ class Produto extends Model
     protected $casts = [
         'preco_unit' => 'float',
         'quantidade_estoque' => 'int',
-        'validade' => 'datetime',
+        'validade' => 'date',
         'quant_unit_medida' => 'float',
         'fk_horta_id' => 'int',
         'fk_unidade_medida_id' => 'int'
@@ -65,7 +65,7 @@ class Produto extends Model
         return $this->belongsTo(UnidadeMedida::class, 'fk_unidade_medida_id');
     }
 
-    public function imagens()
+    public function imagem()
     {
         return $this->hasMany(Imagem::class, 'fk_produto_id');
     }

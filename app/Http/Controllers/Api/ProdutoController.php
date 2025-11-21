@@ -10,11 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Imagem;
 use App\Models\Horta;
 
-
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
-
 
 
 class ProdutoController extends Controller
@@ -51,6 +49,7 @@ class ProdutoController extends Controller
      */
     if ($request->filled('min')) {
         $query->where('preco_unit', '>=', $request->min);
+
     }
 
     if ($request->filled('max')) {
@@ -61,9 +60,7 @@ class ProdutoController extends Controller
         $query->where('nome', 'like', '%' . $request->nome . '%');
     }
 
-    /**
-     * 3. Retorno final
-     */
+
     return ProdutoResource::collection(
         $query->with('unidadeMedida', 'imagens')->get()
     );
@@ -106,37 +103,39 @@ class ProdutoController extends Controller
     }
 
 
-    public function update(UpdateProdutoRequest $request, Produto $produto)
-    {
-        if ($produto->fk_horta_id !== auth()->user()->hortas->id) {
-            return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
-        }
+public function update(UpdateProdutoRequest $request, Produto $produto)
+{
+    // horta do produtor logado
+    $horta = Horta::where('fk_usuario_id', auth()->id())->first();
 
-        DB::transaction(function () use ($request, $produto) {
-
-            $produto->update($request->validated());
-
-            if ($request->has('caminho')) {
-
-                if ($produto->imagem) {
-                    $produto->imagem->update([
-                        'caminho' => $request->file('caminho')->store('produtos'),
-                    ]);
-                } else {
-                    Imagem::create([
-                        'caminho' => $request->file('caminho')->store('produtos'),
-                        'fk_usuario_id' => auth()->user()->id,
-                        'fk_produto_id' => $produto->id,
-                    ]);
-                }
-            }
-        });
-
-        $produto->load('imagem');
-
-        return new ProdutoResource($produto);
+    if (!$horta || $produto->fk_horta_id !== $horta->id) {
+        return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
     }
 
+    DB::transaction(function () use ($request, $produto) {
+
+        $produto->update($request->validated());
+
+        if ($request->hasFile('caminho')) {
+
+            if ($produto->imagem) {
+                $produto->imagem->update([
+                    'caminho' => $request->file('caminho')->store('produtos'),
+                ]);
+            } else {
+                Imagem::create([
+                    'caminho' => $request->file('caminho')->store('produtos'),
+                    'fk_usuario_id' => auth()->user()->id,
+                    'fk_produto_id' => $produto->id,
+                ]);
+            }
+        }
+    });
+
+    $produto->load('imagem');
+
+    return new ProdutoResource($produto);
+}
 
 
 
