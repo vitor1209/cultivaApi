@@ -60,7 +60,7 @@ class Produto extends Model
         return $this->belongsTo(Horta::class, 'fk_horta_id');
     }
 
-    public function unidadeMedida()
+    public function unidade_medida()
     {
         return $this->belongsTo(UnidadeMedida::class, 'fk_unidade_medida_id');
     }

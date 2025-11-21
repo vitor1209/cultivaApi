@@ -25,42 +25,52 @@ class ProdutoController extends Controller
 
 
     public function index(Request $request)
-{
-    $query = Produto::query();
+    {
+        $query = Produto::query(); // ← garante que SEMPRE existe
 
-    /**
-     * 1. Se o usuário passar horta_id → filtra por ela
-     */
-    if ($request->filled('horta_id')) {
-        $hortaId = $request->horta_id;
+        $user = auth()->user();
 
-        if (!Horta::find($hortaId)) {
-            return response()->json([
-                'message' => 'Horta não encontrada',
-                'data' => []
-            ], 404);
+        if ($user && $user->Tipo_usuario === 'produtor') {
+
+            $horta = Horta::where('fk_usuario_id', $user->id)->first();
+
+            if (!$horta) {
+                return response()->json(['data' => []]);
+            }
+
+            $hortaId = $horta->id;
+            $query->where('fk_horta_id', $hortaId);  // produtor só vê a própria horta
+
+        } elseif ($request->has('horta_id')) {
+
+            $hortaId = $request->horta_id;
+
+            if (!Horta::find($hortaId)) {
+                return response()->json([
+                    'message' => 'Horta não encontrada',
+                    'data' => []
+                ], 404);
+            }
+
+            $query->where('fk_horta_id', $hortaId); // visitante escolhe uma horta
         }
 
-        $query->where('fk_horta_id', $hortaId);
-    }
+        // FILTROS
+        if ($request->filled('min')) {
+            $query->where('preco', '>=', $request->min);
+        }
+
+        if ($request->filled('max')) {
+            $query->where('preco', '<=', $request->max);
+        }
+
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
+        }
 
     /**
-     * 2. Filtros opcionais
+     * 3. Retorno final
      */
-    if ($request->filled('min')) {
-        $query->where('preco_unit', '>=', $request->min);
-
-    }
-
-    if ($request->filled('max')) {
-        $query->where('preco_unit', '<=', $request->max);
-    }
-
-    if ($request->filled('nome')) {
-        $query->where('nome', 'like', '%' . $request->nome . '%');
-    }
-
-
     return ProdutoResource::collection(
         $query->with('unidadeMedida', 'imagens')->get()
     );
@@ -74,21 +84,36 @@ class ProdutoController extends Controller
 
     public function store(StoreProdutoRequest $request)
     {
-        $result = DB::transaction(function () use ($request) {
+        $user = auth()->user();
 
-            $produto = Produto::create($request->validated());
+        // Recupera a horta do produtor logado
+        $horta = Horta::where('fk_usuario_id', $user->id)->first();
+
+        if (!$horta) {
+            return response()->json([
+                'message' => 'Horta não encontrada para este produtor.'
+            ], 404);
+        }
+
+        $result = DB::transaction(function () use ($request, $horta, $user) {
+
+            // Garante que o produto pertence à horta do produtor autenticado
+            $dados = $request->validated();
+            $dados['fk_horta_id'] = $horta->id;
+
+            // Cria o produto
+            $produto = Produto::create($dados);
 
             $imagem = null;
 
-            // Verifica se o arquivo foi enviado
+            // Upload de imagem (opcional)
             if ($request->hasFile('caminho') && $request->file('caminho')->isValid()) {
                 $imagem = Imagem::create([
                     'caminho' => $request->file('caminho')->store('produtos', 'public'),
-                    'fk_usuario_id' => auth()->user()->id,
+                    'fk_usuario_id' => $user->id,
                     'fk_produto_id' => $produto->id,
                 ]);
             }
-
 
             return [
                 'produto' => $produto,
@@ -96,48 +121,61 @@ class ProdutoController extends Controller
             ];
         });
 
-        // Carrega o relacionamento imagens (mesmo que não exista)
+        // Retorna produto já com imagens
         $result['produto']->load('imagens');
 
         return new ProdutoResource($result['produto']);
     }
 
 
-public function update(UpdateProdutoRequest $request, Produto $produto)
-{
-    // horta do produtor logado
-    $horta = Horta::where('fk_usuario_id', auth()->id())->first();
 
-    if (!$horta || $produto->fk_horta_id !== $horta->id) {
-        return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
-    }
+    public function update(UpdateProdutoRequest $request, Produto $produto)
+    {
+        $user = auth()->user();
 
-    DB::transaction(function () use ($request, $produto) {
+        // Obtém a horta do produtor autenticado
+        $horta = Horta::where('fk_usuario_id', $user->id)->first();
 
-        $produto->update($request->validated());
-
-        if ($request->hasFile('caminho')) {
-
-            if ($produto->imagem) {
-                $produto->imagem->update([
-                    'caminho' => $request->file('caminho')->store('produtos'),
-                ]);
-            } else {
-                Imagem::create([
-                    'caminho' => $request->file('caminho')->store('produtos'),
-                    'fk_usuario_id' => auth()->user()->id,
-                    'fk_produto_id' => $produto->id,
-                ]);
-            }
+        if (!$horta) {
+            return response()->json(['message' => 'Horta não encontrada para este produtor'], 404);
         }
-    });
 
-    $produto->load('imagem');
+        // Verifica se o produto pertence à horta do produtor
+        if ($produto->fk_horta_id !== $horta->id) {
+            return response()->json(['message' => 'Acesso negado. Você não é o dono deste produto.'], 403);
+        }
 
-    return new ProdutoResource($produto);
-}
+        DB::transaction(function () use ($request, $produto, $user) {
 
+            // Atualiza dados textuais do produto
+            $produto->update($request->validated());
 
+            // Atualiza ou cria imagem
+            if ($request->hasFile('caminho') && $request->file('caminho')->isValid()) {
+
+                // Pega imagem existente (se tiver)
+                $imagem = $produto->imagens()->first();
+
+                if ($imagem) {
+                    // Atualiza imagem existente
+                    $imagem->update([
+                        'caminho' => $request->file('caminho')->store('produtos', 'public'),
+                    ]);
+                } else {
+                    // Cria uma nova imagem
+                    $produto->imagens()->create([
+                        'caminho' => $request->file('caminho')->store('produtos', 'public'),
+                        'fk_usuario_id' => $user->id,
+                    ]);
+                }
+            }
+        });
+
+        // Retorna produto já com imagens carregadas
+        $produto->load('imagens');
+
+        return new ProdutoResource($produto);
+    }
 
     public function destroy(Produto $produto)
     {
