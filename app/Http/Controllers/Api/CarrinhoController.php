@@ -17,7 +17,7 @@ class CarrinhoController extends Controller
         $this->middleware('consumidor')->only(['store', 'update', 'destroy']);
     }
 
-    
+
     public function store(Request $request) #cria um 'carrinho'
     {
         $request->validate([
@@ -43,6 +43,7 @@ class CarrinhoController extends Controller
         $itens = ItensSelecionado::where('fk_usuario_id', auth()->id())
             ->whereNull('fk_pedido_id')
             ->with('produto')
+            ->with('imagem')
             ->get();
 
         return response()->json($itens);
