@@ -56,31 +56,34 @@ class ProdutoController extends Controller
         return new ProdutoResource($produto);
     }
 
-
-    
     public function store(StoreProdutoRequest $request)
     {
         $result = DB::transaction(function () use ($request) {
-            $produto = Produto::create($request->validated()); #usa os requests do storeproduto
 
-            $imagem = Imagem::create([
-                'caminho' => $request->file('imagem')->store(),
-                'fk_usuario_id' => auth()->user->id,
-                'fk_produto_id' => $produto->id,
-            ]);
+            $produto = Produto::create($request->validated());
+
+            $imagem = null;
+
+            // Verifica se o arquivo foi enviado
+            if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+                $imagem = Imagem::create([
+                    'caminho' => $request->file('imagem')->store('produtos', 'public'),
+                    'fk_usuario_id' => auth()->user()->id,
+                    'fk_produto_id' => $produto->id,
+                ]);
+            }
 
             return [
                 'produto' => $produto,
-                'imagem'  => $imagem,
+                'imagem' => $imagem,
             ];
         });
 
-        $result['produto']->load('imagem');
+        // Carrega o relacionamento imagens (mesmo que não exista)
+        $result['produto']->load('imagens');
 
-        return (new ProdutoResource($result['produto'])); #instancia
-
+        return new ProdutoResource($result['produto']);
     }
-
 
 
     public function update(UpdateProdutoRequest $request, Produto $produto)
@@ -97,11 +100,11 @@ class ProdutoController extends Controller
 
                 if ($produto->imagem) {
                     $produto->imagem->update([
-                        'caminho' => $request->file('imagem')->store(),
+                        'caminho' => $request->file('caminho')->store('produtos'),
                     ]);
                 } else {
                     Imagem::create([
-                        'caminho' => $request->file('imagem')->store(),
+                        'caminho' => $request->file('caminho')->store('produtos'),
                         'fk_usuario_id' => auth()->user()->id,
                         'fk_produto_id' => $produto->id,
                     ]);
