@@ -42,9 +42,11 @@ class CarrinhoController extends Controller
     {
         $itens = ItensSelecionado::where('fk_usuario_id', auth()->id())
             ->whereNull('fk_pedido_id')
-            ->with('produto')
-            ->with('imagem')
-            ->get();
+        ->with([
+            'produto',
+            'produto.imagens', 
+        ])
+        ->get();
 
         return response()->json($itens);
     }
