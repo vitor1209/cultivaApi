@@ -24,7 +24,7 @@ class UpdateProdutoRequest extends FormRequest
             'fk_unidade_medida_id' => 'nullable|integer',
 
             #imagens
-            'caminho' => 'required|image|mimes:jpg,png,jpeg|max:2048'
+            'caminho' => 'sometimes|image|mimes:jpg,png,jpeg|max:2048'
         ];
     }
 }
