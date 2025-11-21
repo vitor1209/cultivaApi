@@ -65,13 +65,14 @@ class ProdutoController extends Controller
             $imagem = null;
 
             // Verifica se o arquivo foi enviado
-            if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
+            if ($request->hasFile('caminho') && $request->file('caminho')->isValid()) {
                 $imagem = Imagem::create([
-                    'caminho' => $request->file('imagem')->store('produtos', 'public'),
+                    'caminho' => $request->file('caminho')->store('produtos', 'public'),
                     'fk_usuario_id' => auth()->user()->id,
                     'fk_produto_id' => $produto->id,
                 ]);
             }
+
 
             return [
                 'produto' => $produto,
