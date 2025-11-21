@@ -10,9 +10,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Imagem;
 use App\Models\Horta;
 
+
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
+
 
 
 class ProdutoController extends Controller
@@ -68,13 +70,11 @@ class ProdutoController extends Controller
             $query->where('nome', 'like', '%' . $request->nome . '%');
         }
 
-    /**
-     * 3. Retorno final
-     */
-    return ProdutoResource::collection(
-        $query->with('unidadeMedida', 'imagens')->get()
-    );
-}
+        return ProdutoResource::collection(
+            $query->with('unidade_medida', 'imagens')->get()
+        );
+    }
+
 
 
     public function show(Produto $produto)
