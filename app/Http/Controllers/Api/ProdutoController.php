@@ -70,11 +70,10 @@ class ProdutoController extends Controller
 
             if ($request->hasFile('caminho') && $request->file('caminho')->isValid()) {
                 $imagem = Imagem::create([
-    'caminho' => $request->file('caminho')->store('produtos', 'public'),
-    'fk_usuario_id' => $user->id,
-    'fk_produto_id' => $produto->id,
-]);
-
+                    'caminho' => $request->file('caminho')->store('produtos', 'public'),
+                    'fk_usuario_id' => $user->id,
+                    'fk_produto_id' => $produto->id,
+                ]);
             }
 
             return ['produto' => $produto, 'imagem' => $imagem];
@@ -124,4 +123,3 @@ class ProdutoController extends Controller
         return response()->json(['message' => 'Produto deletado com sucesso']);
     }
 }
-
