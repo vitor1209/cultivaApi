@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('hortas', HortaController::class);
 });

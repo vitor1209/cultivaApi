@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class CheckProdutor
+class CheckConsumidor
 {
     public function handle(Request $request, Closure $next)
     {

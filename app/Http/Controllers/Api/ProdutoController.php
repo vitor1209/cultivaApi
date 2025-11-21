@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateProdutoRequest;
 use App\Http\Resources\ProdutoResource;
 use App\Http\Controllers\Controller;
 use App\Models\Imagem;
+use App\Models\Horta;
+
 
 use Illuminate\Support\Facades\DB;
 
@@ -26,22 +28,53 @@ class ProdutoController extends Controller
 
     public function index(Request $request)
     {
-        $min  = $request->input('min');
-        $max  = $request->input('max');
-        $nome = $request->input('nome');
+        // $userId = auth()->id();
+        // $horta = Horta::where('fk_usuario_id', $userId)->first();
+        // $hortaId = $horta->id;
 
-        $query = Produto::query();
+            $user = auth()->user();
 
-        if (!is_null($min)) {
-            $query->where('preco', '>=', $min);
+    if ($user && $user->Tipo_usuario === 'produtor') {
+        $userId = auth()->id();
+        $horta = Horta::where('fk_usuario_id', $userId)->first();
+        $hortaId = $horta->id;;
+
+        if (!$horta) {
+            return response()->json(['data' => []]);
         }
 
-        if (!is_null($max)) {
-            $query->where('preco', '<=', $max);
+        $hortaId = $horta->id;
+    }
+
+    elseif ($request->has('horta_id')) {
+
+        $hortaId = $request->horta_id;
+
+
+        if (!Horta::find($hortaId)) {
+            return response()->json([
+                'message' => 'Horta não encontrada',
+                'data' => []
+            ], 404);
         }
 
-        if (!is_null($nome)) {
-            $query->where('nome', 'like', "%{$nome}%");
+    }     else {
+        $query = Produto::query(); #ve todas as hortas se n coloca id
+    }
+
+
+
+
+        if ($request->filled('min')) {
+            $query->where('preco', '>=', $request->min);
+        }
+
+        if ($request->filled('max')) {
+            $query->where('preco', '<=', $request->max);
+        }
+
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', '%' . $request->nome . '%');
         }
 
         return ProdutoResource::collection(
