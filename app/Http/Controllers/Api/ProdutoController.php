@@ -27,29 +27,14 @@ class ProdutoController extends Controller
 
 
     public function index(Request $request)
-    {
-        // $userId = auth()->id();
-        // $horta = Horta::where('fk_usuario_id', $userId)->first();
-        // $hortaId = $horta->id;
+{
+    $query = Produto::query();
 
-            $user = auth()->user();
-
-    if ($user && $user->Tipo_usuario === 'produtor') {
-        $userId = auth()->id();
-        $horta = Horta::where('fk_usuario_id', $userId)->first();
-        $hortaId = $horta->id;;
-
-        if (!$horta) {
-            return response()->json(['data' => []]);
-        }
-
-        $hortaId = $horta->id;
-    }
-
-    elseif ($request->has('horta_id')) {
-
+    /**
+     * 1. Se o usuário passar horta_id → filtra por ela
+     */
+    if ($request->filled('horta_id')) {
         $hortaId = $request->horta_id;
-
 
         if (!Horta::find($hortaId)) {
             return response()->json([
@@ -58,30 +43,31 @@ class ProdutoController extends Controller
             ], 404);
         }
 
-    }     else {
-        $query = Produto::query(); #ve todas as hortas se n coloca id
+        $query->where('fk_horta_id', $hortaId);
     }
 
-
-
-
-        if ($request->filled('min')) {
-            $query->where('preco', '>=', $request->min);
-        }
-
-        if ($request->filled('max')) {
-            $query->where('preco', '<=', $request->max);
-        }
-
-        if ($request->filled('nome')) {
-            $query->where('nome', 'like', '%' . $request->nome . '%');
-        }
-
-        return ProdutoResource::collection(
-            $query->with('unidadeMedida')->get()
-        );
+    /**
+     * 2. Filtros opcionais
+     */
+    if ($request->filled('min')) {
+        $query->where('preco_unit', '>=', $request->min);
     }
 
+    if ($request->filled('max')) {
+        $query->where('preco_unit', '<=', $request->max);
+    }
+
+    if ($request->filled('nome')) {
+        $query->where('nome', 'like', '%' . $request->nome . '%');
+    }
+
+    /**
+     * 3. Retorno final
+     */
+    return ProdutoResource::collection(
+        $query->with('unidadeMedida', 'imagens')->get()
+    );
+}
 
 
     public function show(Produto $produto)
