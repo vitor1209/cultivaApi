@@ -9,53 +9,84 @@ use App\Models\Produto;
 
 class CarrinhoController extends Controller
 {
-
-
     public function __construct()
     {
-
-        $this->middleware('consumidor')->only(['store', 'update', 'destroy']);
+        // Apenas proteger rotas que realmente precisam
+        $this->middleware('consumidor')->only(['store', 'destroy']);
     }
 
-
-    public function store(Request $request) #cria um 'carrinho'
+    /**
+     * Adiciona um item ao carrinho
+     */
+    public function store(Request $request)
     {
         $request->validate([
             'produto_id' => 'required|exists:produtos,id',
             'quantidade' => 'required|integer|min:1'
         ]);
 
-        $produto = Produto::find($request->produto_id); #procura se o produto existe e epga o id
+        $produto = Produto::findOrFail($request->produto_id);
 
-        $item = ItensSelecionado::create([  #cria o itens selecionados e calcula preco etc, deixando a chave do pedido null pq ele ainda não finalizou entao ainda nao tem pedido
+        // Verificar se esse produto já está no carrinho (sem pedido)
+        $itemExistente = ItensSelecionado::where('fk_usuario_id', auth()->id())
+            ->where('fk_produto_id', $produto->id)
+            ->whereNull('fk_pedido_id')
+            ->first();
+
+        if ($itemExistente) {
+
+            // Atualiza quantidade FINAL, não soma
+            $itemExistente->quantidade_item_total = $request->quantidade;
+            $itemExistente->preco_item_total = $itemExistente->quantidade_item_total * $produto->preco_unit;
+            $itemExistente->save();
+
+            return response()->json([
+                'message' => 'Quantidade atualizada no carrinho',
+                'item' => $itemExistente->load(['produto', 'produto.imagens'])
+            ]);
+        }
+
+        // Se não existir ainda, cria novo
+        $item = ItensSelecionado::create([
             'fk_produto_id' => $produto->id,
             'fk_usuario_id' => auth()->id(),
             'quantidade_item_total' => $request->quantidade,
-            'preco_item_total' => $request->quantidade * $produto->preco_unit,
+            'preco_item_total' => $produto->preco_unit * $request->quantidade,
             'fk_pedido_id' => null
         ]);
 
-        return response()->json(['message' => 'Item adicionado ao carrinho', 'item' => $item]);
+        return response()->json([
+            'message' => 'Item adicionado ao carrinho',
+            'item' => $item->load(['produto', 'produto.imagens'])
+        ]);
     }
 
-    public function index() #lista os itens do carrinho
+
+    /**
+     * Lista os itens do carrinho do usuário autenticado
+     */
+    public function index()
     {
         $itens = ItensSelecionado::where('fk_usuario_id', auth()->id())
             ->whereNull('fk_pedido_id')
-        ->with([
-            'produto',
-            'produto.imagens', 
-        ])
-        ->get();
+            ->with([
+                'produto',
+                'produto.imagens',
+                'produto.horta'
+            ])
+            ->get();
 
         return response()->json($itens);
     }
 
-    public function destroy($id) #tira os itens do carrinho
+    /**
+     * Remove um item do carrinho
+     */
+    public function destroy($id)
     {
         $item = ItensSelecionado::where('id', $id)
-            ->whereNull('fk_pedido_id')
             ->where('fk_usuario_id', auth()->id())
+            ->whereNull('fk_pedido_id')
             ->firstOrFail();
 
         $item->delete();

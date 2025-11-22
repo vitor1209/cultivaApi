@@ -14,8 +14,6 @@ use Carbon\Carbon;
 class PedidoController extends Controller
 {
 
-
-
     public function finalizarPedido(Request $request)
     {
         $request->validate([

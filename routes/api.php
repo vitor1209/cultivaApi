@@ -61,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/enderecos/{enderecoId}', [EnderecoController::class, 'update']);
     Route::delete('/enderecos/{enderecoId}/desvincular', [EnderecoController::class, 'detach']);
     Route::delete('/enderecos/{enderecoId}', [EnderecoController::class, 'destroy']);
-});  
+});
 
 
 use App\Http\Controllers\Api\ImagensController;
