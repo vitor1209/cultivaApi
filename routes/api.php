@@ -85,6 +85,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/pedido/finalizar', [PedidoController::class, 'finalizarPedido']);
 
+
 });
 
+Route::middleware('auth:sanctum')->get('/produtor/pedidos', [PedidoController::class, 'pedidosDoProdutor']);
 #o middleware esta sendo usado para que somemete usuarios logados possam acessar as rotas especificas, os de recuperar senha não possuem pois os usuarios não lembram o login

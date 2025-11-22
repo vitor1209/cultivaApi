@@ -83,4 +83,27 @@ class PedidoController extends Controller
             'grupos_hortas' => $gruposPorHorta->count()
         ]);
     }
+
+    public function pedidosDoProdutor()
+    {
+        $produtorId = auth()->id();
+
+        $pedidos = Pedido::whereHas('itens.produto.horta', function ($q) use ($produtorId) {
+            $q->where('fk_usuario_id', $produtorId);
+        })
+            ->with([
+                'usuario',
+                'itens' => function ($q) use ($produtorId) {
+                    $q->whereHas('produto.horta', function ($q2) use ($produtorId) {
+                        $q2->where('fk_usuario_id', $produtorId);
+                    })->with('produto.horta');
+                }
+            ])
+            ->get();
+
+        return response()->json([
+            'pedidos' => $pedidos,
+            'total' => $pedidos->count(),
+        ]);
+    }
 }
