@@ -13,53 +13,60 @@ use Carbon\Carbon;
 
 class PedidoController extends Controller
 {
+
+
+
     public function finalizarPedido(Request $request)
     {
         $request->validate([
             'forma_pagamento' => 'required|string',
-            'servico_entrega' => 'required|in:0,1' # 0 a pessoa vai retirar 1 vai entregar
+            'servico_entrega' => 'required|in:0,1'  # 0 a pessoa vai retirar 1 vai entregar
         ]);
 
         $usuarioId = auth()->id();
 
         $itens = ItensSelecionado::where('fk_usuario_id', $usuarioId) #pega os itens do carrinho, se estiver vazio erro
             ->whereNull('fk_pedido_id')
+            ->with('produto.horta')
             ->get();
 
         if ($itens->isEmpty()) {
             return response()->json(['error' => 'Carrinho vazio'], 400);
         }
 
-        $hortaId = null; #verifica se todos os produtos no carrinho são da mesma horta, ponto necessario para finalizar o pedido
-        foreach ($itens as $item) {
-            $hortaDoProduto = $item->produto->fk_horta_id;
-
-            if ($hortaId === null) {
-                $hortaId = $hortaDoProduto;
-            } elseif ($hortaId !== $hortaDoProduto) {
-                return response()->json(['error' => 'Itens de hortas diferentes. Faça pedidos separados.'], 400);
-            }
-        }
-
-        $horta = Horta::find($hortaId);
 
         #soma e calcula o preço total de todos os itens do carrinho
+
         $valorItens = $itens->sum('preco_item_total');
 
+        $gruposPorHorta = $itens->groupBy(function ($item) {
+            return $item->produto->horta->id;
+        });
+
+        $freteTotal = 0;
+
         #ve qual é o valor do fete
-        $frete = ($request->servico_entrega == 1) ? $horta->frete : 0;
+
+        if ($request->servico_entrega == 1) {
+            foreach ($gruposPorHorta as $hortaId => $itemsDaHorta) {
+                $horta = $itemsDaHorta->first()->produto->horta;
+
+                // frete de cada horta
+                $freteTotal += $horta->frete;
+            }
+        }
 
         #cria a entrega, que só pode ser criada após finalizar o pedido
         $entrega = Entrega::create([
             'servico_entrega' => $request->servico_entrega,
-            'frete' => $frete,
+            'frete' => $freteTotal,
             'data_entregue' => null
         ]);
 
         #cria o pedido que dpende do id da entrega
         $pedido = Pedido::create([
-            'data_hora' => Carbon::now(),
-            'preco_final' => $valorItens + $frete,
+            'data_hora' => now(),
+            'preco_final' => $valorItens + $freteTotal,
             'status' => 1,
             'forma_pagamento' => $request->forma_pagamento,
             'fk_entrega_id' => $entrega->id,
@@ -68,14 +75,14 @@ class PedidoController extends Controller
 
         #associa toddos os itens a esse pedido
         foreach ($itens as $item) {
-            $item->update([
-                'fk_pedido_id' => $pedido->id
-            ]);
+            $item->update(['fk_pedido_id' => $pedido->id]);
         }
 
         return response()->json([
             'message' => 'Pedido finalizado com sucesso!',
-            'pedido' => $pedido
+            'pedido' => $pedido,
+            'frete_total' => $freteTotal,
+            'grupos_hortas' => $gruposPorHorta->count()
         ]);
     }
 }
