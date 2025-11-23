@@ -115,12 +115,12 @@ class PedidoController extends Controller
 
 
 
-        public function pedidosDoConsumidor()
+    public function pedidosDoConsumidor()
     {
         $consumidorId = auth()->id();
 
         $pedidos = Pedido::where('fk_usuario_id', $consumidorId)
-        
+
             ->with([
                 // Pega apenas o último endereço do usuário
                 'usuario' => function ($q) {
@@ -129,7 +129,7 @@ class PedidoController extends Controller
                     }]);
                 },
                 'entregas',
-                'itens' => function ($q){
+                'itens' => function ($q) {
                     $q->with('produto.horta');
                 }
             ])
@@ -138,6 +138,36 @@ class PedidoController extends Controller
         return response()->json([
             'pedidos' => $pedidos,
             'total' => $pedidos->count(),
+        ]);
+    }
+
+
+
+    public function atualizarStatusProdutor(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|integer|in:1,2,3,4,5'
+            // Coloque aqui somente os status válidos
+        ]);
+
+        $produtorId = auth()->id();
+
+        $pedido = Pedido::where('id', $id)
+            ->whereHas('itens.produto.horta', function ($q) use ($produtorId) {
+                $q->where('fk_usuario_id', $produtorId);
+            })
+            ->first();
+
+        if (!$pedido) {
+            return response()->json(['error' => 'Pedido não encontrado para este produtor'], 404);
+        }
+
+        $pedido->status = $request->status;
+        $pedido->save();
+
+        return response()->json([
+            'message' => 'Status atualizado com sucesso',
+            'pedido' => $pedido
         ]);
     }
 }
