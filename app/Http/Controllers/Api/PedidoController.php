@@ -92,11 +92,17 @@ class PedidoController extends Controller
             $q->where('fk_usuario_id', $produtorId);
         })
             ->with([
-                'usuario',
+                // Pega apenas o último endereço do usuário
+                'usuario' => function ($q) {
+                    $q->with(['enderecos' => function ($q2) {
+                        $q2->latest('id')->limit(1); // último endereço
+                    }]);
+                },
+                'entregas',
                 'itens' => function ($q) use ($produtorId) {
                     $q->whereHas('produto.horta', function ($q2) use ($produtorId) {
                         $q2->where('fk_usuario_id', $produtorId);
-                    })->with('produto.horta');
+                    })->with('produto');
                 }
             ])
             ->get();

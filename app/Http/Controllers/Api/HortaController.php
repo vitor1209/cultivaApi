@@ -19,7 +19,8 @@ class HortaController extends Controller
 
     public function index()
     {
-        return HortaResource::collection(Horta::all());
+        $hortas = Horta::with('usuario')->get();
+        return HortaResource::collection($hortas);
     }
 
 

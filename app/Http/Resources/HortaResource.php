@@ -12,13 +12,17 @@ class HortaResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request)
     {
-        return[
+        return [
             'id' => $this->id,
-            'nome_horta' => $this->nome_horta,
-            'fk_usuario_id' => $this->fk_usuario_id,
-            'frete' => $this->frete,
+            'nome' => $this->nome_horta,
+            'usuario' => [
+                'nome' => $this->usuario->nome,
+                'telefone' => $this->usuario->telefone,
+                'email' => $this->usuario->email,
+                'banner' => $this->usuario->banner,
+            ],
         ];
     }
 }

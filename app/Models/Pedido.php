@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Pedido
- * 
+ *
  * @property int $id
  * @property Carbon|null $data_hora
  * @property float|null $preco_final
@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $avaliacao
  * @property int|null $fk_entrega_id
  * @property int|null $fk_usuario_id
- * 
+ *
  * @property Entrega|null $entrega
  * @property Usuario|null $usuario
  * @property Collection|ItensSelecionado[] $itens_selecionados
@@ -37,7 +37,7 @@ class Pedido extends Model
 	protected $casts = [
 		'data_hora' => 'datetime',
 		'preco_final' => 'float',
-		'status' => 'bool',
+		'status' => 'int',
 		'fk_entrega_id' => 'int',
 		'fk_usuario_id' => 'int'
 	];

@@ -32,7 +32,7 @@ class User extends Authenticatable
         'Tipo_usuario',
         'frete',
         'nome_horta'
-        
+
     ];
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -33,14 +34,21 @@ class EnderecoController extends Controller
             'complemento' => 'nullable|string|max:255',
         ]);
 
+        // Cria o novo endereço
         $endereco = Endereco::create($request->all());
+
+        // Remove todos os endereços antigos do usuário
+        $usuario->enderecos()->detach();
+
+        // Vincula o novo endereço
         $usuario->enderecos()->attach($endereco->id);
 
         return response()->json([
-            'message' => 'Endereço criado com sucesso!',
+            'message' => 'Endereço criado com sucesso e antigos removidos!',
             'endereco' => $endereco
         ], 201);
     }
+
 
     public function update(Request $request, $enderecoId)
     {
@@ -83,36 +91,3 @@ class EnderecoController extends Controller
         return response()->json(['message' => 'Endereço excluído com sucesso!']);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
