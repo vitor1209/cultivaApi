@@ -22,8 +22,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:usuario', // observar esse unique aqui
             'telefone' => 'required|string|max:15',
             'datanasc' => 'required|date',
-            'foto' => 'nullable|string',
-            'banner' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'banner' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
             'password' => ['required', 'confirmed', Password::defaults()],
             'Tipo_usuario' => 'required|in:consumidor,produtor', // <- mudou
 
@@ -109,8 +109,8 @@ class AuthController extends Controller
         'nome' => 'sometimes|string|max:255',
         'telefone' => 'sometimes|string|max:15',
         'datanasc' => 'sometimes|date',
-        'foto' => 'nullable|string',
-        'banner' => 'nullable|string',
+        'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        'banner' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
     ];
 
     if ($user->Tipo_usuario === 'produtor') { #se for produtor tbm tem essas coisinhas bacanas
@@ -140,7 +140,7 @@ class AuthController extends Controller
 
     return response()->json([
         'message' => 'Dados atualizados com sucesso',
-        'user' => $user->load('hortas'), 
+        'user' => $user->load('hortas'),
     ]);
 }
 
@@ -148,6 +148,6 @@ class AuthController extends Controller
 
 
 
-    
+
 
 }
