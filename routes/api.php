@@ -35,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 });
-Route::middleware('auth:sanctum')->put('/user/editar', [AuthController::class, 'update']);
+Route::middleware('auth:sanctum')->post('/user/editar', [AuthController::class, 'update']);
 
 
 use App\Http\Controllers\Auth\PasswordResetController;

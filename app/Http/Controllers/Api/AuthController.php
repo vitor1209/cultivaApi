@@ -22,8 +22,8 @@ class AuthController extends Controller
             'email' => 'required|email|unique:usuario', // observar esse unique aqui
             'telefone' => 'required|string|max:15',
             'datanasc' => 'required|date',
-            'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-            'banner' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'foto' => 'sometimes|image|mimes:jpg,png,jpeg|max:2048',
+            'banner' => 'sometimes|image|mimes:jpg,png,jpeg|max:2048',
             'password' => ['required', 'confirmed', Password::defaults()],
             'Tipo_usuario' => 'required|in:consumidor,produtor', // <- mudou
 
@@ -101,26 +101,37 @@ class AuthController extends Controller
 
 
 
-    public function update(Request $request)
+public function update(Request $request) #laravel só aceita arquivo se o método for post
 {
-    $user = $request->user(); #pega o usuario de jeito
+    $user = $request->user();
 
     $rules = [
         'nome' => 'sometimes|string|max:255',
         'telefone' => 'sometimes|string|max:15',
         'datanasc' => 'sometimes|date',
-        'foto' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
-        'banner' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        'foto' => 'sometimes|image|mimes:jpg,png,jpeg|max:2048',
+        'banner' => 'sometimes|image|mimes:jpg,png,jpeg|max:2048',
     ];
 
-    if ($user->Tipo_usuario === 'produtor') { #se for produtor tbm tem essas coisinhas bacanas
+    if ($user->Tipo_usuario === 'produtor') {
         $rules['nome_horta'] = 'sometimes|string|max:255';
         $rules['frete'] = 'sometimes|numeric|min:0';
     }
 
     $data = $request->validate($rules);
 
-    DB::transaction(function () use ($user, $data) {
+    DB::transaction(function () use ($user, $data, $request) {
+
+        #pra salvar as fotos
+        if ($request->hasFile('foto')) {
+            $pathFoto = $request->file('foto')->store('fotos', 'public');
+            $data['foto'] = $pathFoto;
+        }
+
+        if ($request->hasFile('banner')) {
+            $pathBanner = $request->file('banner')->store('banners', 'public');
+            $data['banner'] = $pathBanner;
+        }
 
         $user->update([
             'nome' => $data['nome'] ?? $user->nome,
@@ -130,7 +141,7 @@ class AuthController extends Controller
             'banner' => $data['banner'] ?? $user->banner,
         ]);
 
-        if ($user->Tipo_usuario === 'produtor' && ($user->hortas ?? false)) {
+        if ($user->Tipo_usuario === 'produtor' && $user->hortas) {
             $user->hortas->update([
                 'nome_horta' => $data['nome_horta'] ?? $user->hortas->nome_horta,
                 'frete' => $data['frete'] ?? $user->hortas->frete,
