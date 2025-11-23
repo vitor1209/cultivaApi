@@ -99,4 +99,55 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logout realizado']);
     }
 
+
+
+    public function update(Request $request)
+{
+    $user = $request->user(); #pega o usuario de jeito
+
+    $rules = [
+        'nome' => 'sometimes|string|max:255',
+        'telefone' => 'sometimes|string|max:15',
+        'datanasc' => 'sometimes|date',
+        'foto' => 'nullable|string',
+        'banner' => 'nullable|string',
+    ];
+
+    if ($user->Tipo_usuario === 'produtor') { #se for produtor tbm tem essas coisinhas bacanas
+        $rules['nome_horta'] = 'sometimes|string|max:255';
+        $rules['frete'] = 'sometimes|numeric|min:0';
+    }
+
+    $data = $request->validate($rules);
+
+    DB::transaction(function () use ($user, $data) {
+
+        $user->update([
+            'nome' => $data['nome'] ?? $user->nome,
+            'telefone' => $data['telefone'] ?? $user->telefone,
+            'datanasc' => $data['datanasc'] ?? $user->datanasc,
+            'foto' => $data['foto'] ?? $user->foto,
+            'banner' => $data['banner'] ?? $user->banner,
+        ]);
+
+        if ($user->Tipo_usuario === 'produtor' && ($user->hortas ?? false)) {
+            $user->hortas->update([
+                'nome_horta' => $data['nome_horta'] ?? $user->hortas->nome_horta,
+                'frete' => $data['frete'] ?? $user->hortas->frete,
+            ]);
+        }
+    });
+
+    return response()->json([
+        'message' => 'Dados atualizados com sucesso',
+        'user' => $user->load('hortas'), 
+    ]);
+}
+
+
+
+
+
+    
+
 }
