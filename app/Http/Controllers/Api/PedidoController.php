@@ -112,4 +112,32 @@ class PedidoController extends Controller
             'total' => $pedidos->count(),
         ]);
     }
+
+
+
+        public function pedidosDoConsumidor()
+    {
+        $consumidorId = auth()->id();
+
+        $pedidos = Pedido::where('fk_usuario_id', $consumidorId)
+        
+            ->with([
+                // Pega apenas o último endereço do usuário
+                'usuario' => function ($q) {
+                    $q->with(['enderecos' => function ($q2) {
+                        $q2->latest('id')->limit(1); // último endereço
+                    }]);
+                },
+                'entregas',
+                'itens' => function ($q){
+                    $q->with('produto.horta');
+                }
+            ])
+            ->get();
+
+        return response()->json([
+            'pedidos' => $pedidos,
+            'total' => $pedidos->count(),
+        ]);
+    }
 }
