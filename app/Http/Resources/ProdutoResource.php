@@ -9,7 +9,6 @@ class ProdutoResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        // Pega a primeira imagem (opcional)
         $imagem = $this->imagens?->first();
 
         return [
@@ -23,7 +22,6 @@ class ProdutoResource extends JsonResource
             'fk_horta_id' => $this->fk_horta_id,
             'fk_unidade_medida_id' => $this->fk_unidade_medida_id,
 
-            // URL da primeira imagem ou null
             'imagem' => $imagem ? asset('storage/' . $imagem->caminho) : null,
         ];
     }

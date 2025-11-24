@@ -49,7 +49,6 @@ class PedidoController extends Controller
             foreach ($gruposPorHorta as $hortaId => $itemsDaHorta) {
                 $horta = $itemsDaHorta->first()->produto->horta;
 
-                // frete de cada horta
                 $freteTotal += $horta->frete;
             }
         }
@@ -92,10 +91,10 @@ class PedidoController extends Controller
             $q->where('fk_usuario_id', $produtorId);
         })
             ->with([
-                // Pega apenas o último endereço do usuário
+                #pega apenas o último endereço do usuário
                 'usuario' => function ($q) {
                     $q->with(['enderecos' => function ($q2) {
-                        $q2->latest('id')->limit(1); // último endereço
+                        $q2->latest('id')->limit(1); 
                     }]);
                 },
                 'entregas',
@@ -115,17 +114,16 @@ class PedidoController extends Controller
 
 
 
-    public function pedidosDoConsumidor()
+    public function pedidosDoConsumidor() #funcao parecida ocom a do produtor, só muda a parte de que aqui não pega horta
     {
         $consumidorId = auth()->id();
 
         $pedidos = Pedido::where('fk_usuario_id', $consumidorId)
 
             ->with([
-                // Pega apenas o último endereço do usuário
                 'usuario' => function ($q) {
                     $q->with(['enderecos' => function ($q2) {
-                        $q2->latest('id')->limit(1); // último endereço
+                        $q2->latest('id')->limit(1); 
                     }]);
                 },
                 'entregas',

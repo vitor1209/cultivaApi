@@ -27,7 +27,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'Tipo_usuario' => 'required|in:consumidor,produtor', // <- mudou
 
-            // Campos apenas para produtores
+            #campos apenas para produtores
             'nome_horta' => 'required_if:Tipo_usuario,produtor|string|max:255',
             'frete' => 'required_if:Tipo_usuario,produtor|numeric|min:0',
         ]);
@@ -38,7 +38,7 @@ class AuthController extends Controller
             $user = User::create([
                 'nome' => $data['nome'],
                 'email' => $data['email'],
-                'Tipo_usuario' => $data['Tipo_usuario'], // <- mudou
+                'Tipo_usuario' => $data['Tipo_usuario'], 
                 'telefone' => $data['telefone'],
                 'datanasc' => $data['datanasc'],
                 'foto' => $data['foto'] ?? null,

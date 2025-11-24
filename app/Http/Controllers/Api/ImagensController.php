@@ -31,7 +31,6 @@ class ImagensController extends Controller
         $produto = Imagem::create($request->validated());
 
         return (new ImagemResource($produto));
-         
     }
 
 
@@ -52,7 +51,7 @@ class ImagensController extends Controller
 
     public function destroy(Imagem $imagem)
     {
-         $userHortaId = auth()->user()->horta->id;
+        $userHortaId = auth()->user()->horta->id;
         $imagemHortaId = $imagem->produto->horta->id;
 
         if ($imagemHortaId !== $userHortaId) {

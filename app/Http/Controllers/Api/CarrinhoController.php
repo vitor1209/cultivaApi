@@ -7,17 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\ItensSelecionado;
 use App\Models\Produto;
 
-class CarrinhoController extends Controller
+class CarrinhoController extends Controller  #basicamente é feito com a entidade fraca itens selecionados do bd, e faz um tipo de juncao com o pedido, quando é finalizado cria o id do pedido e status muda
 {
     public function __construct()
     {
-        // Apenas proteger rotas que realmente precisam
         $this->middleware('consumidor')->only(['store', 'destroy']);
     }
 
-    /**
-     * Adiciona um item ao carrinho
-     */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -27,7 +24,7 @@ class CarrinhoController extends Controller
 
         $produto = Produto::findOrFail($request->produto_id);
 
-        // Verificar se esse produto já está no carrinho (sem pedido)
+        # verificar se esse produto já está no carrinho (sem pedido)
         $itemExistente = ItensSelecionado::where('fk_usuario_id', auth()->id())
             ->where('fk_produto_id', $produto->id)
             ->whereNull('fk_pedido_id')
@@ -35,7 +32,7 @@ class CarrinhoController extends Controller
 
         if ($itemExistente) {
 
-            // Atualiza quantidade FINAL, não soma
+            #atualiza quantidade final, não soma
             $itemExistente->quantidade_item_total = $request->quantidade;
             $itemExistente->preco_item_total = $itemExistente->quantidade_item_total * $produto->preco_unit;
             $itemExistente->save();
@@ -46,7 +43,7 @@ class CarrinhoController extends Controller
             ]);
         }
 
-        // Se não existir ainda, cria novo
+        #se não existir ainda cria novo
         $item = ItensSelecionado::create([
             'fk_produto_id' => $produto->id,
             'fk_usuario_id' => auth()->id(),
@@ -62,9 +59,6 @@ class CarrinhoController extends Controller
     }
 
 
-    /**
-     * Lista os itens do carrinho do usuário autenticado
-     */
     public function index()
     {
         $itens = ItensSelecionado::where('fk_usuario_id', auth()->id())
@@ -79,9 +73,7 @@ class CarrinhoController extends Controller
         return response()->json($itens);
     }
 
-    /**
-     * Remove um item do carrinho
-     */
+
     public function destroy($id)
     {
         $item = ItensSelecionado::where('id', $id)

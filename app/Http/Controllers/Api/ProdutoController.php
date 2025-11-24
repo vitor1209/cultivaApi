@@ -19,7 +19,6 @@ class ProdutoController extends Controller
         $this->middleware('produtor')->only(['store', 'update', 'destroy']);
     }
 
-    // Listar produtos
     public function index(Request $request)
     {
         $query = Produto::query();
@@ -37,7 +36,8 @@ class ProdutoController extends Controller
             $query->where('fk_horta_id', $hortaId);
         }
 
-        // FILTROS
+
+        #filtros
         if ($request->filled('min')) $query->where('preco_unit', '>=', $request->min);
         if ($request->filled('max')) $query->where('preco_unit', '<=', $request->max);
         if ($request->filled('nome')) $query->where('nome', 'like', '%' . $request->nome . '%');
@@ -47,13 +47,11 @@ class ProdutoController extends Controller
         );
     }
 
-    // Mostrar produto
     public function show(Produto $produto)
     {
         return new ProdutoResource($produto->load('unidadeMedida', 'imagens'));
     }
 
-    // Criar produto
     public function store(StoreProdutoRequest $request)
     {
         $user = auth()->user();
@@ -83,7 +81,6 @@ class ProdutoController extends Controller
         return new ProdutoResource($result['produto']);
     }
 
-    // Atualizar produto
     public function update(UpdateProdutoRequest $request, Produto $produto)
     {
         $user = auth()->user();
@@ -111,7 +108,6 @@ class ProdutoController extends Controller
         return new ProdutoResource($produto);
     }
 
-    // Deletar produto
     public function destroy(Produto $produto)
     {
         $userHorta = auth()->user()->hortas;

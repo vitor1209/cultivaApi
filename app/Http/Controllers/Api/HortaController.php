@@ -34,9 +34,7 @@ class HortaController extends Controller
     public function update(UpdateHortaRequest $request, Horta $horta)
     {
 
-        // Só permite alterar se for dono
 
-        // $horta = Horta::findOrFail($id);
 
         if ((int)$horta->fk_usuario_id !== auth()->id()) {
             return response()->json(['message' => 'Acesso negado. Você não é o dono desta horta.'], 403);

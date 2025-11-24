@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class PasswordResetController extends Controller
 {
-     // Enviar link para o email
+    #envia o link
     public function sendResetLink(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -23,7 +23,6 @@ class PasswordResetController extends Controller
             : response()->json(['message' => 'Erro ao enviar email'], 400);
     }
 
-    // Resetar senha
     public function resetPassword(Request $request)
     {
 
